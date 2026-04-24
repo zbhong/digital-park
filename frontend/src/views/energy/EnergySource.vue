@@ -1,13 +1,18 @@
 <template>
   <div>
     <el-form :model="queryParams" ref="queryRef" :inline="true" class="search-form">
-      <el-form-item label="设备名称" prop="name">
-        <el-input v-model="queryParams.name" placeholder="请输入设备名称" clearable style="width: 200px" @keyup.enter="handleQuery" />
+      <el-form-item label="设备名称" prop="machineName">
+        <el-input v-model="queryParams.machineName" placeholder="请输入设备名称" clearable style="width: 200px" @keyup.enter="handleQuery" />
       </el-form-item>
-      <el-form-item label="类型" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择类型" clearable style="width: 140px">
-          <el-option label="光伏" value="solar" /><el-option label="风电" value="wind" />
-          <el-option label="储能" value="storage" /><el-option label="配电" value="distribution" />
+      <el-form-item label="设备类型" prop="machineType">
+        <el-select v-model="queryParams.machineType" placeholder="请选择设备类型" clearable style="width: 160px">
+          <el-option v-for="item in energyDeviceTypes" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable style="width: 120px">
+          <el-option label="在线" value="1" />
+          <el-option label="离线" value="0" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -18,53 +23,112 @@
 
     <el-row :gutter="10" class="toolbar">
       <el-col :span="1.5"><el-button type="primary" plain :icon="Plus" @click="handleAdd">新增设备</el-button></el-col>
+      <el-col :span="1.5"><el-button type="success" plain :icon="Refresh" @click="getList">同步数据</el-button></el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="dataList" border stripe>
-      <el-table-column label="设备名称" prop="name" align="center" min-width="150" show-overflow-tooltip />
-      <el-table-column label="编码" prop="code" align="center" min-width="120" />
-      <el-table-column label="类型" prop="type" align="center" min-width="100">
-        <template #default="{ row }"><el-tag size="small">{{ typeNameMap[row.type] }}</el-tag></template>
+      <el-table-column type="index" label="序号" width="55" align="center" />
+      <el-table-column label="设备名称" prop="machineName" align="center" min-width="150" show-overflow-tooltip />
+      <el-table-column label="设备编码" prop="machineCode" align="center" min-width="130" show-overflow-tooltip />
+      <el-table-column label="设备类型" prop="machineType" align="center" min-width="100">
+        <template #default="{ row }"><el-tag size="small">{{ getDeviceTypeName(row.machineType) }}</el-tag></template>
       </el-table-column>
-      <el-table-column label="额定功率" prop="ratedPower" align="center" min-width="100" />
-      <el-table-column label="位置" prop="location" align="center" min-width="120" />
+      <el-table-column label="安装位置" prop="location" align="center" min-width="150" show-overflow-tooltip />
+      <el-table-column label="IP地址" prop="ipAddress" align="center" min-width="130" />
       <el-table-column label="状态" prop="status" align="center" min-width="80">
-        <template #default="{ row }"><el-tag :type="statusTagMap[row.status]" size="small">{{ statusNameMap[row.status] }}</el-tag></template>
+        <template #default="{ row }">
+          <el-tag :type="row.status === '1' || row.status === 1 ? 'success' : 'info'" size="small">
+            {{ row.status === '1' || row.status === 1 ? '在线' : '离线' }}
+          </el-tag>
+        </template>
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="150" fixed="right">
         <template #default="{ row }">
+          <el-button link type="primary" :icon="View" @click="handleView(row)">详情</el-button>
           <el-button link type="primary" :icon="Edit" @click="handleEdit(row)">编辑</el-button>
           <el-button link type="danger" :icon="Delete" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
-      <template #empty><el-empty description="暂无数据" /></template>
+      <template #empty><el-empty description="暂无数据，请确认设备接口是否连通" /></template>
     </el-table>
 
     <el-pagination v-show="total > 0" v-model:current-page="queryParams.pageNum" v-model:page-size="queryParams.pageSize"
-      :page-sizes="[10, 20, 50]" :total="total" layout="total, sizes, prev, pager, next, jumper" background class="pagination"
+      :page-sizes="[10, 20, 50, 100]" :total="total" layout="total, sizes, prev, pager, next, jumper" background class="pagination"
       @size-change="getList" @current-change="getList" />
 
-    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="600px" append-to-body destroy-on-close @close="resetForm">
+    <!-- 新增/编辑对话框 -->
+    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="650px" append-to-body destroy-on-close @close="resetForm">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-row :gutter="20">
-          <el-col :span="12"><el-form-item label="设备名称" prop="name"><el-input v-model="form.name" placeholder="请输入设备名称" /></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="编码" prop="code"><el-input v-model="form.code" placeholder="请输入编码" /></el-form-item></el-col>
+          <el-col :span="12">
+            <el-form-item label="设备名称" prop="machineName">
+              <el-input v-model="form.machineName" placeholder="请输入设备名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="设备编码" prop="machineCode">
+              <el-input v-model="form.machineCode" placeholder="请输入设备编码" />
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="12"><el-form-item label="类型" prop="type">
-            <el-select v-model="form.type" placeholder="请选择" style="width: 100%">
-              <el-option label="光伏" value="solar" /><el-option label="风电" value="wind" />
-              <el-option label="储能" value="storage" /><el-option label="配电" value="distribution" />
-            </el-select>
-          </el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="额定功率" prop="ratedPower"><el-input v-model="form.ratedPower" placeholder="请输入额定功率" /></el-form-item></el-col>
+          <el-col :span="12">
+            <el-form-item label="设备类型" prop="machineType">
+              <el-select v-model="form.machineType" placeholder="请选择设备类型" style="width: 100%">
+                <el-option v-for="item in energyDeviceTypes" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态" prop="status">
+              <el-select v-model="form.status" placeholder="请选择状态" style="width: 100%">
+                <el-option label="在线" value="1" />
+                <el-option label="离线" value="0" />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
-        <el-form-item label="位置" prop="location"><el-input v-model="form.location" placeholder="请输入安装位置" /></el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="IP地址" prop="ipAddress">
+              <el-input v-model="form.ipAddress" placeholder="请输入IP地址" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="端口号" prop="port">
+              <el-input v-model="form.port" placeholder="请输入端口号" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="安装位置" prop="location">
+          <el-input v-model="form.location" placeholder="请输入安装位置" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入备注" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitForm">确 定</el-button>
       </template>
+    </el-dialog>
+
+    <!-- 详情对话框 -->
+    <el-dialog title="设备详情" v-model="detailVisible" width="650px" append-to-body destroy-on-close>
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="设备名称">{{ detailData.machineName }}</el-descriptions-item>
+        <el-descriptions-item label="设备编码">{{ detailData.machineCode }}</el-descriptions-item>
+        <el-descriptions-item label="设备类型">{{ getDeviceTypeName(detailData.machineType) }}</el-descriptions-item>
+        <el-descriptions-item label="状态">
+          <el-tag :type="detailData.status === '1' || detailData.status === 1 ? 'success' : 'info'" size="small">
+            {{ detailData.status === '1' || detailData.status === 1 ? '在线' : '离线' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="IP地址">{{ detailData.ipAddress }}</el-descriptions-item>
+        <el-descriptions-item label="端口号">{{ detailData.port }}</el-descriptions-item>
+        <el-descriptions-item label="安装位置" :span="2">{{ detailData.location }}</el-descriptions-item>
+        <el-descriptions-item label="备注" :span="2">{{ detailData.remark }}</el-descriptions-item>
+      </el-descriptions>
     </el-dialog>
   </div>
 </template>
@@ -72,14 +136,34 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { getMeterList, getMeter, addMeter, updateMeter, deleteMeter, getSourceList, getSource, addSource, updateSource, deleteSource } from '@/api/energy'
+import { Search, Refresh, Plus, Edit, Delete, View } from '@element-plus/icons-vue'
+import { getDeviceMachineList, getDeviceMachineDetail, addDeviceMachine, updateDeviceMachine, deleteDeviceMachine } from '@/api/starnet'
 
-const typeNameMap = { solar: '光伏', wind: '风电', storage: '储能', distribution: '配电' }
-const statusTagMap = { running: 'success', stopped: 'info', fault: 'danger' }
-const statusNameMap = { running: '运行中', stopped: '已停机', fault: '故障' }
+// 能源管理下的设备类型（电表等）
+const energyDeviceTypes = ref([
+  { label: '电表', value: '电表' },
+  { label: '水表', value: '水表' },
+  { label: '气表', value: '气表' },
+  { label: '冷量表', value: '冷量表' },
+  { label: '光伏', value: '光伏' },
+  { label: '储能', value: '储能' }
+])
 
-const queryParams = reactive({ pageNum: 1, pageSize: 10, name: '', type: '' })
+// 设备类型名称映射
+const deviceTypeNameMap = {
+  '电表': '电表',
+  '水表': '水表',
+  '气表': '气表',
+  '冷量表': '冷量表',
+  '光伏': '光伏',
+  '储能': '储能'
+}
+
+function getDeviceTypeName(type) {
+  return deviceTypeNameMap[type] || type || '未知'
+}
+
+const queryParams = reactive({ pageNum: 1, pageSize: 10, machineName: '', machineType: '', status: '' })
 const loading = ref(false)
 const dataList = ref([])
 const total = ref(0)
@@ -88,11 +172,24 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const formRef = ref(null)
 const form = ref({})
-const rules = { name: [{ required: true, message: '设备名称不能为空', trigger: 'blur' }], type: [{ required: true, message: '请选择类型', trigger: 'change' }] }
+const detailVisible = ref(false)
+const detailData = ref({})
+const rules = {
+  machineName: [{ required: true, message: '设备名称不能为空', trigger: 'blur' }],
+  machineCode: [{ required: true, message: '设备编码不能为空', trigger: 'blur' }]
+}
 
 function getList() {
   loading.value = true
-  getSourceList(queryParams).then(res => { dataList.value = res.rows || []; total.value = res.total || 0 }).catch(() => {
+  getDeviceMachineList(queryParams).then(res => {
+    // 兼容若依框架返回格式
+    const rows = res.rows || res.data || []
+    // 过滤出能源类设备
+    const energyTypes = energyDeviceTypes.value.map(t => t.value)
+    dataList.value = Array.isArray(rows) ? rows.filter(item => energyTypes.includes(item.machineType)) : []
+    total.value = res.total || dataList.value.length
+  }).catch(err => {
+    console.warn('[能源管理] 接口请求失败，请确认设备系统是否连通:', err.message)
     dataList.value = []
     total.value = 0
   }).finally(() => { loading.value = false })
@@ -100,17 +197,68 @@ function getList() {
 
 function handleQuery() { queryParams.pageNum = 1; getList() }
 function resetQuery() { if (queryRef.value) queryRef.value.resetFields(); handleQuery() }
-function resetForm() { form.value = { id: undefined, name: '', code: '', type: '', ratedPower: '', location: '' }; if (formRef.value) formRef.value.resetFields() }
-function handleAdd() { resetForm(); dialogTitle.value = '新增源侧设备'; dialogVisible.value = true }
-function handleEdit(row) { form.value = { ...row }; dialogTitle.value = '编辑源侧设备'; dialogVisible.value = true }
-function submitForm() { formRef.value.validate(valid => { if (valid) { const api = form.value.id ? updateSource : addSource; api(form.value).then(() => { ElMessage.success(form.value.id ? '修改成功' : '新增成功'); dialogVisible.value = false; getList() }).catch(() => { ElMessage.error('操作失败') }) } }) }
-function handleDelete(row) { ElMessageBox.confirm('是否确认删除？', '系统提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }).then(() => { deleteSource(row.id).then(() => { ElMessage.success('删除成功'); getList() }).catch(() => { ElMessage.error('删除失败') }) }).catch(() => {}) }
+
+function resetForm() {
+  form.value = {
+    id: undefined,
+    machineName: '',
+    machineCode: '',
+    machineType: '',
+    status: '1',
+    ipAddress: '',
+    port: '',
+    location: '',
+    remark: ''
+  }
+  if (formRef.value) formRef.value.resetFields()
+}
+
+function handleAdd() {
+  resetForm()
+  dialogTitle.value = '新增能源设备'
+  dialogVisible.value = true
+}
+
+function handleEdit(row) {
+  resetForm()
+  form.value = { ...row }
+  dialogTitle.value = '编辑能源设备'
+  dialogVisible.value = true
+}
+
+function handleView(row) {
+  detailData.value = { ...row }
+  detailVisible.value = true
+}
+
+function submitForm() {
+  formRef.value.validate(valid => {
+    if (valid) {
+      const api = form.value.id ? updateDeviceMachine : addDeviceMachine
+      api(form.value).then(() => {
+        ElMessage.success(form.value.id ? '修改成功' : '新增成功')
+        dialogVisible.value = false
+        getList()
+      }).catch(() => { ElMessage.error('操作失败') })
+    }
+  })
+}
+
+function handleDelete(row) {
+  ElMessageBox.confirm('是否确认删除该设备？', '系统提示', {
+    confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'
+  }).then(() => {
+    deleteDeviceMachine(row.id).then(() => {
+      ElMessage.success('删除成功')
+      getList()
+    }).catch(() => { ElMessage.error('删除失败') })
+  }).catch(() => {})
+}
 
 onMounted(() => { getList() })
 </script>
 
 <style lang="scss" scoped>
-.app-container { padding: 16px; }
 .search-form { margin-bottom: 12px; }
 .toolbar { margin-bottom: 12px; }
 .pagination { margin-top: 16px; display: flex; justify-content: flex-end; }

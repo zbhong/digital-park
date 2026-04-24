@@ -183,27 +183,6 @@
     justify-content: center;
     flex-shrink: 0;
     overflow: visible;
-
-    // 底部冰青色发光装饰线
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 10%;
-      right: 10%;
-      height: 2px;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        var(--accent) 20%,
-        var(--accent) 80%,
-        transparent 100%
-      );
-      box-shadow:
-        0 0 10px var(--accent-glow),
-        0 0 20px var(--accent-glow);
-      border-radius: 1px;
-    }
   }
 
   // 标题文字

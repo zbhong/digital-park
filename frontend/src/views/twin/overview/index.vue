@@ -66,15 +66,20 @@ function toggleFullscreen() {
   }
 }
 
-// ---- 16:9 等比缩放 ----
+// ---- 自适应缩放 ----
 const DESIGN_WIDTH = 1920
 const DESIGN_HEIGHT = 1080
 
 function updateScale() {
   const el = cockpitRef.value
   if (!el) return
-  const vw = window.innerWidth
-  const vh = window.innerHeight
+  // 使用 cockpit-viewport（父容器）的实际尺寸，而非 window 尺寸
+  // 因为驾驶舱在 Layout 内部，需要减去侧边栏、顶部导航、标签栏等占用空间
+  const viewport = el.parentElement
+  if (!viewport) return
+  const vw = viewport.clientWidth
+  const vh = viewport.clientHeight
+  if (vw <= 0 || vh <= 0) return
   const scaleX = vw / DESIGN_WIDTH
   const scaleY = vh / DESIGN_HEIGHT
   const scale = Math.min(scaleX, scaleY)
@@ -147,8 +152,8 @@ function onFullscreenChange() {
 
 <style lang="scss" scoped>
 .cockpit-viewport {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background: #021E4D;
   position: relative;

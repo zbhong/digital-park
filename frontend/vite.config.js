@@ -24,6 +24,12 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:8080',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        // 外部设备系统接口代理（starnet）
+        '/starnet-api': {
+          target: 'http://192.168.30.91:8080',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/starnet-api/, '')
         }
       }
     },
