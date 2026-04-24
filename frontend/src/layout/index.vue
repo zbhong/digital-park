@@ -16,11 +16,7 @@
 
       <!-- 主内容区 -->
       <el-main class="app-main">
-        <router-view v-slot="{ Component }">
-          <transition name="fade-transform" mode="out-in">
-            <component :is="Component" :key="route.fullPath" />
-          </transition>
-        </router-view>
+        <router-view :key="route.fullPath" />
       </el-main>
     </el-container>
   </el-container>

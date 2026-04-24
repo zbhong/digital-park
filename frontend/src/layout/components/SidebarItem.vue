@@ -97,10 +97,17 @@ function resolvePath(routePath) {
   if (routePath.startsWith('/') || routePath.startsWith('http')) {
     return routePath
   }
+  let fullPath
   if (props.basePath) {
-    return `${props.basePath}/${routePath}`.replace(/\/+/g, '/')
+    fullPath = `${props.basePath}/${routePath}`.replace(/\/+/g, '/')
+  } else {
+    fullPath = `/${routePath}`.replace(/\/+/g, '/')
   }
-  return `/${routePath}`.replace(/\/+/g, '/')
+  // 确保返回绝对路径
+  if (!fullPath.startsWith('/') && !fullPath.startsWith('http')) {
+    fullPath = `/${fullPath}`
+  }
+  return fullPath
 }
 
 function handleMenuClick(menuRoute) {

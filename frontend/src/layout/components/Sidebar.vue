@@ -219,7 +219,12 @@ function getFullPath(parentPath, childPath) {
   if (childPath.startsWith('/') || childPath.startsWith('http')) {
     return childPath
   }
-  return `${parentPath}/${childPath}`.replace(/\/+/g, '/')
+  let fullPath = `${parentPath}/${childPath}`.replace(/\/+/g, '/')
+  // 确保返回绝对路径
+  if (!fullPath.startsWith('/') && !fullPath.startsWith('http')) {
+    fullPath = `/${fullPath}`
+  }
+  return fullPath
 }
 
 /**
@@ -232,9 +237,14 @@ function handleMenuClick(menuRoute, parentPath) {
   if (parentPath && !fullPath.startsWith('/') && !fullPath.startsWith('http')) {
     fullPath = `${parentPath}/${fullPath}`.replace(/\/+/g, '/')
   }
+  // 确保路径是绝对路径
+  if (!fullPath.startsWith('/') && !fullPath.startsWith('http')) {
+    fullPath = `/${fullPath}`
+  }
   if (fullPath.startsWith('http')) {
     window.open(fullPath, '_blank')
   }
+  // 注意：非 http 链接由 el-menu 的 @select 事件处理，这里不需要重复调用 router.push
 }
 
 /**
@@ -243,7 +253,9 @@ function handleMenuClick(menuRoute, parentPath) {
  */
 function handleSelect(index) {
   if (index && !index.startsWith('http')) {
-    router.push(index).catch(() => {})
+    // 确保路径以 / 开头，避免相对路径解析错误
+    const path = index.startsWith('/') ? index : `/${index}`
+    router.push(path).catch(() => {})
   }
 }
 </script>
