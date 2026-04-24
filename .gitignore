@@ -1,0 +1,28 @@
+# Dependencies
+frontend/node_modules/
+backend/target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+nohup.out
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+frontend/dist/
+backend/target/classes/
+
+# Uploads
+*.uploads/

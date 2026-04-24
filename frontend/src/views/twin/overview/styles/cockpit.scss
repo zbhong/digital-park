@@ -1,0 +1,545 @@
+// ============================================================
+// 数字孪生驾驶舱大屏 - 全局样式
+// 深海深空科技风 + 玻璃拟态
+// 注意：所有样式限定在 .cockpit-container 内，避免泄漏到其他页面
+// ============================================================
+
+// --- 驾驶舱容器（所有样式的根） ---
+.cockpit-container {
+  // --- CSS 变量（限定在驾驶舱容器内） ---
+  --bg-deep: #021E4D;
+  --bg-card: rgba(2, 30, 77, 0.85);
+  --accent: #00E5FF;
+  --accent-glow: rgba(0, 229, 255, 0.3);
+  --success: #27C97A;
+  --warning: #FF9500;
+  --danger: #FF3333;
+  --text-primary: #E8F0FE;
+  --text-secondary: rgba(232, 240, 254, 0.6);
+  --border-glow: rgba(0, 229, 255, 0.25);
+  --card-radius: 12px;
+  --card-gap: 12px;
+
+  // --- 背景与科技网格暗纹 ---
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-deep);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(0, 229, 255, 0.03) 39px,
+      rgba(0, 229, 255, 0.03) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(0, 229, 255, 0.03) 39px,
+      rgba(0, 229, 255, 0.03) 40px
+    );
+  background-size: 40px 40px;
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+    'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  // --- 滚动条美化（限定在驾驶舱容器内） ---
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 229, 255, 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 229, 255, 0.5);
+  }
+}
+
+// --- 三栏主布局 ---
+.cockpit-main {
+  flex: 1;
+  display: flex;
+  gap: var(--card-gap);
+  padding: var(--card-gap);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.panel-left,
+.panel-right {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--card-gap);
+}
+
+.panel-center {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+// --- 玻璃拟态卡片 ---
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--card-radius);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(0, 229, 255, 0.1);
+  overflow: hidden;
+  animation: cardFadeIn 0.5s ease forwards;
+  opacity: 0;
+
+  &:nth-child(1) { animation-delay: 0s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.2s; }
+  &:nth-child(4) { animation-delay: 0.3s; }
+  &:nth-child(5) { animation-delay: 0.4s; }
+  &:nth-child(6) { animation-delay: 0.5s; }
+  &:nth-child(7) { animation-delay: 0.6s; }
+  &:nth-child(8) { animation-delay: 0.7s; }
+  &:nth-child(9) { animation-delay: 0.8s; }
+  &:nth-child(10) { animation-delay: 0.9s; }
+
+  // 卡片标题栏
+  &__header {
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.15) 0%, transparent 100%);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+
+  // 标题前荧光冰青竖条装饰
+  &__bar {
+    display: inline-block;
+    width: 4px;
+    height: 12px;
+    background: var(--accent);
+    border-radius: 2px;
+    box-shadow: 0 0 6px var(--accent-glow);
+    flex-shrink: 0;
+  }
+
+  // 标题文字
+  &__title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // 卡片内容区
+  &__body {
+    padding: 14px;
+  }
+}
+
+// --- 卡片入场动画 ---
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// --- 顶部标题栏 ---
+.cockpit-header {
+  height: 56px;
+  width: 100%;
+  position: relative;
+  z-index: 100;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 30, 77, 0.95) 0%,
+    rgba(2, 30, 77, 0.8) 100%
+  );
+  border-bottom: 1px solid var(--border-glow);
+  box-shadow: 0 2px 8px rgba(0, 229, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: visible;
+
+  // 底部冰青色发光装饰线
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--accent) 20%,
+      var(--accent) 80%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 10px var(--accent-glow),
+      0 0 20px var(--accent-glow);
+    border-radius: 1px;
+  }
+}
+
+// 标题文字
+.header-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--text-primary);
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+  position: relative;
+  z-index: 1;
+  font-family: '优设标题黑', 'YouSheBiaoTiHei', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+// 标题两侧科技装饰线条
+.header-decoration {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 200px;
+  height: 2px;
+  pointer-events: none;
+
+  &.left {
+    right: calc(50% + 180px);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--border-glow) 40%,
+      var(--accent) 100%
+    );
+
+    // 菱形装饰
+    &::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+  }
+
+  &.right {
+    left: calc(50% + 180px);
+    background: linear-gradient(
+      270deg,
+      transparent 0%,
+      var(--border-glow) 40%,
+      var(--accent) 100%
+    );
+
+    // 菱形装饰
+    &::after {
+      content: '';
+      position: absolute;
+      left: -4px;
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+  }
+}
+
+// --- Tab 样式 ---
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+  margin-top: 2px;
+
+  .tab-item {
+    padding: 6px 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    user-select: none;
+    white-space: nowrap;
+
+    // 激活态
+    &.active {
+      color: var(--accent);
+      background: rgba(0, 229, 255, 0.1);
+
+      // 底部冰青色发光条
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--accent-glow);
+      }
+    }
+
+    // 悬浮态（非激活）
+    &:hover:not(.active) {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+// --- Tab 项独立样式（TopTabBar.vue 使用） ---
+.tab-item {
+  padding: 6px 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  border: 1px solid transparent;
+
+  // 激活态：亮青色背景 + 白色文字 + 发光效果
+  &.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.35) 0%, rgba(0, 229, 255, 0.15) 100%);
+    border-color: var(--accent);
+    box-shadow:
+      0 0 12px var(--accent-glow),
+      0 0 24px rgba(0, 229, 255, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 8px var(--accent-glow);
+
+    // 底部冰青色发光条
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      border-radius: 1px;
+    }
+  }
+
+  // 非激活态：透明背景 + 弱化文字
+  &:not(.active) {
+    color: var(--text-secondary);
+    background: transparent;
+    border-color: rgba(0, 229, 255, 0.12);
+  }
+
+  // 悬浮态（非激活）
+  &:hover:not(.active) {
+    color: var(--text-primary);
+    background: rgba(0, 229, 255, 0.08);
+    border-color: rgba(0, 229, 255, 0.3);
+  }
+}
+
+// --- 数字显示 ---
+.stat-number {
+  font-family: 'DIN Alternate', 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent-glow);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+// --- 告警滚动列表 ---
+.alert-scroll-list {
+  max-height: 240px;
+  overflow: hidden;
+
+  .alert-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-primary);
+    line-height: 1.5;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  // 告警等级圆点
+  .alert-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--danger {
+      background: var(--danger);
+      box-shadow: 0 0 6px rgba(255, 51, 51, 0.5);
+    }
+
+    &--warning {
+      background: var(--warning);
+      box-shadow: 0 0 6px rgba(255, 149, 0, 0.5);
+    }
+
+    &--success {
+      background: var(--success);
+      box-shadow: 0 0 6px rgba(39, 201, 122, 0.5);
+    }
+  }
+
+  // 告警等级标签
+  .alert-tag {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    font-weight: 500;
+
+    &--danger {
+      color: var(--danger);
+      background: rgba(255, 51, 51, 0.15);
+    }
+
+    &--warning {
+      color: var(--warning);
+      background: rgba(255, 149, 0, 0.15);
+    }
+
+    &--success {
+      color: var(--success);
+      background: rgba(39, 201, 122, 0.15);
+    }
+  }
+
+  .alert-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-secondary);
+  }
+
+  .alert-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+}
+
+// --- 呼吸脉冲动画 ---
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes alertPulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 5px var(--danger);
+  }
+  50% {
+    opacity: 0.5;
+    box-shadow: 0 0 20px var(--danger);
+  }
+}
+
+// ============================================================
+// Layout 全局覆盖（驾驶舱全屏模式）
+// 仅当 cockpit-container 存在时生效，避免影响其他页面
+// ============================================================
+.cockpit-container {
+  // 向上查找 .app-main 祖先
+  :where(.app-main) & {
+    background-color: transparent !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+// 隐藏 Layout 自带的顶部导航栏和标签页（仅驾驶舱页面）
+// 使用 :has 选择器确保只在包含 cockpit-container 时生效
+.app-main:has(.cockpit-container) {
+  background-color: transparent !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.main-container:has(.cockpit-container) {
+  padding-top: 0 !important;
+}
+
+.app-wrapper:has(.cockpit-container) .header-container,
+.app-wrapper:has(.cockpit-container) .tags-view-container {
+  display: none !important;
+}
+
+.app-wrapper:has(.cockpit-container) .sidebar-container {
+  display: block !important;
+  z-index: 200;
+}

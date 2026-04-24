@@ -1,0 +1,261 @@
+/* ==================== LED 数字 ==================== */
+.led {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+.led small {
+  font-size: 0.7em;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+/* ==================== 数据卡片 ==================== */
+.data-card {
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  border: var(--glass-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--glass-shadow);
+  padding: 14px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeSlideIn 0.4s ease forwards;
+}
+
+.card-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 217, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.card-header::before {
+  content: '';
+  width: 3px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 2px;
+  box-shadow: 0 0 6px var(--accent-glow);
+  flex-shrink: 0;
+}
+
+/* ==================== 统计网格 ==================== */
+.stat-grid {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.stat-grid.cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.stat-grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(0, 217, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 217, 255, 0.05);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-value {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==================== 状态点 ==================== */
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.online {
+  background: var(--success);
+  box-shadow: 0 0 4px rgba(40, 199, 111, 0.5);
+}
+
+.status-dot.offline {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.status-dot.alarm {
+  background: var(--danger);
+  box-shadow: 0 0 4px rgba(255, 59, 59, 0.5);
+  animation: alertBlink 1.5s ease-in-out infinite;
+}
+
+/* ==================== 图表容器 ==================== */
+.chart-container {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.chart-box-sm {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.chart-box-md {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+/* ==================== 滚动列表 ==================== */
+.scroll-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0, 217, 255, 0.02);
+  border-radius: 4px;
+  font-size: 11px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.list-item:hover {
+  background: rgba(0, 217, 255, 0.06);
+}
+
+.list-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.list-badge.critical {
+  background: rgba(255, 59, 59, 0.15);
+  color: var(--danger);
+}
+
+.list-badge.major {
+  background: rgba(255, 149, 0, 0.15);
+  color: #ff9500;
+}
+
+.list-badge.minor {
+  background: rgba(0, 217, 255, 0.1);
+  color: var(--accent);
+}
+
+.list-badge.info {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.list-content {
+  flex: 1;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-time {
+  color: var(--text-secondary);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.empty-hint {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 20px 0;
+}
+
+/* ==================== 自定义滚动条 ==================== */
+.scroll-list::-webkit-scrollbar,
+.stat-grid::-webkit-scrollbar,
+.fire-electric-rows::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scroll-list::-webkit-scrollbar-track,
+.stat-grid::-webkit-scrollbar-track,
+.fire-electric-rows::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-list::-webkit-scrollbar-thumb,
+.stat-grid::-webkit-scrollbar-thumb,
+.fire-electric-rows::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.2);
+  border-radius: 2px;
+}
+
+.scroll-list::-webkit-scrollbar-thumb:hover,
+.stat-grid::-webkit-scrollbar-thumb:hover,
+.fire-electric-rows::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 217, 255, 0.4);
+}
+
+/* ==================== 动画 ==================== */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes alertBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
