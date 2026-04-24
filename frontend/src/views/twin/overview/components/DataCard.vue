@@ -22,7 +22,8 @@ defineProps({
 @import '../styles/cockpit.scss';
 
 .glass-card {
-  min-width: 376px;
+  min-width: 0;
+  flex-shrink: 0;
 
   &__header {
     position: relative;

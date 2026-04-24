@@ -386,7 +386,8 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;  // 等比居中裁剪，保留原图比例，不挤压变形
+  object-position: center center;
   z-index: 0;
 }
 

@@ -845,6 +845,8 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 12px;
   height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 // ============ 园区总览 - 综合信息网格 ============
@@ -1131,7 +1133,7 @@ onBeforeUnmount(() => {
 // ============ 图表容器 ============
 .chart-container {
   width: 100%;
-  height: 180px;
+  height: 150px;
 
   &--tall {
     height: 200px;

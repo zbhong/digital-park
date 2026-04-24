@@ -722,12 +722,14 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 12px;
   height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 // 告警滚动列表
 .alert-scroll-list {
   max-height: 200px;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .alert-item {
@@ -1341,6 +1343,6 @@ onBeforeUnmount(() => {
 // 图表容器
 .chart-container {
   width: 100%;
-  height: 180px;
+  height: 150px;
 }
 </style>
